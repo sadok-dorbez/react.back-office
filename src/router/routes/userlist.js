@@ -1,13 +1,11 @@
 import UserList from "../../views/list/Table"
-// ...
 
 const Routes = [
-  // ...
   {
     path: "/userlist",
-    element: <UserList />
+    exact: true,
+    component: UserList
   }
 ]
 
-// ...
 export default Routes

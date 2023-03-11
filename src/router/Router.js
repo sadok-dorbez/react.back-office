@@ -1,6 +1,8 @@
 // ** Router imports
 import { useRoutes } from "react-router-dom"
 
+import userlistRoutes from "../router/routes/userlist"
+
 // ** GetRoutes
 import { getRoutes } from "./routes"
 
@@ -13,7 +15,7 @@ const Router = () => {
 
   const allRoutes = getRoutes(layout)
 
-  const routes = useRoutes([...allRoutes])
+  const routes = useRoutes([...allRoutes, ...userlistRoutes])
 
   return routes
 }
