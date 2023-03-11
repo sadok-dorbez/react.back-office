@@ -1,10 +1,12 @@
-import UserList from "../../views/list/Table"
+import { UsersList } from "../../views/list/Table"
+
 
 const Routes = [
   {
     path: "/userlist",
     exact: true,
-    component: UserList
+    component: UsersList,
+    element: <UsersList />
   }
 ]
 
