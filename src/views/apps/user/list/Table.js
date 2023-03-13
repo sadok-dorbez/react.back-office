@@ -6,6 +6,9 @@ export const UsersList = () => {
   const [users, setUsers] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [usersPerPage] = useState(10)
+  const [indexOfLastUser, setIndexOfLastUser] = useState(0)
+  const [indexOfFirstUser, setIndexOfFirstUser] = useState(0)
+  const [currentUsers, setCurrentUsers] = useState([])
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -15,12 +18,12 @@ export const UsersList = () => {
     fetchUsers()
   }, [])
 
-  // Get current users
-  const indexOfLastUser = currentPage * usersPerPage
-  const indexOfFirstUser = indexOfLastUser - usersPerPage
-  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser)
+  useEffect(() => {
+    setIndexOfLastUser(currentPage * usersPerPage)
+    setIndexOfFirstUser(indexOfLastUser - usersPerPage)
+    setCurrentUsers(users.slice(indexOfFirstUser, indexOfLastUser))
+  }, [currentPage, usersPerPage, indexOfLastUser, indexOfFirstUser, users])
 
-  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
   return (
@@ -29,7 +32,8 @@ export const UsersList = () => {
         <Col xl={12}>
           <Card>
             <CardHeader>
-              <i className="fa fa-align-justify"></i> Users <small className="text-muted">example</small>
+              <i className="fa fa-align-justify"></i> Users{" "}
+              <small className="text-muted">example</small>
             </CardHeader>
             <CardBody>
               <Table responsive hover striped>
@@ -58,17 +62,38 @@ export const UsersList = () => {
               </Table>
               <Pagination>
                 <PaginationItem disabled={currentPage <= 0}>
-                  <PaginationLink previous tag="button" onClick={() => setCurrentPage(currentPage - 1)} />
+                  <PaginationLink
+                    previous
+                    tag="button"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  />
                 </PaginationItem>
-                {[...Array(Math.ceil(users.length / usersPerPage)).keys()].map((page) => (
-                  <PaginationItem active={page === currentPage} key={page}>
-                    <PaginationLink tag="button" onClick={() => paginate(page)}>
-                      {page + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem disabled={currentPage >= Math.ceil(users.length / usersPerPage) - 1}>
-                  <PaginationLink next tag="button" onClick={() => setCurrentPage(currentPage + 1)} />
+                {[...Array(Math.ceil(users.length / usersPerPage))].map(
+                  (page, i) => (
+                    <PaginationItem
+                      active={i === currentPage}
+                      key={i}
+                    >
+                      <PaginationLink
+                        tag="button"
+                        onClick={() => paginate(i)}
+                      >
+                        {i + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                )}
+                <PaginationItem
+                  disabled={
+                    currentPage >=
+                    Math.ceil(users.length / usersPerPage) - 1
+                  }
+                >
+                  <PaginationLink
+                    next
+                    tag="button"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  />
                 </PaginationItem>
               </Pagination>
             </CardBody>
