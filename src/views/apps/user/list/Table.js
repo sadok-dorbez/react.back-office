@@ -68,21 +68,13 @@ export const UsersList = () => {
                     onClick={() => setCurrentPage(currentPage - 1)}
                   />
                 </PaginationItem>
-                {[...Array(Math.ceil(users.length / usersPerPage))].map(
-                  (page, i) => (
-                    <PaginationItem
-                      active={i === currentPage}
-                      key={i}
-                    >
-                      <PaginationLink
-                        tag="button"
-                        onClick={() => paginate(i)}
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  )
-                )}
+                {users.length > 0 && Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, i) => (
+                  <PaginationItem key={i} active={i === currentPage}>
+                    <PaginationLink onClick={() => paginate(i)}>{i + 1}</PaginationLink>
+                  </PaginationItem>
+                ))}
+
+
                 <PaginationItem
                   disabled={
                     currentPage >=
