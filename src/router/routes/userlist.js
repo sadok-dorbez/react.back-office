@@ -1,5 +1,4 @@
-import { UsersList } from "../../views/apps/user/list/Table"
-
+import {UsersList} from "../../views/apps/user/list/Table"
 
 const Routes = [
   {
