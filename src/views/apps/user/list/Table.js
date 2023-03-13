@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
 import {
   Card,
   CardBody,
@@ -10,12 +11,25 @@ import {
   PaginationLink
 } from 'reactstrap'
 
-export const UsersList = ({ users }) => {
+export const UsersList = () => {
   const [currentPage, setCurrentPage] = useState(0)
   const [usersPerPage] = useState(10)
+  const [users, setUsers] = useState([])
+
+  useEffect(() => {
+    axios.get('http://localhost:3000/api/users')
+      .then(response => {
+        setUsers(response.data)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }, [])
+
   const indexOfLastUser = (currentPage + 1) * usersPerPage
   const indexOfFirstUser = indexOfLastUser - usersPerPage
   const currentUsers = Array.isArray(users) ? users.slice(indexOfFirstUser, indexOfLastUser) : []
+  const totalPages = Math.ceil(users.length / usersPerPage)
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
@@ -38,7 +52,7 @@ export const UsersList = ({ users }) => {
                 <tr key={i}>
                   <th scope="row">{i + 1}</th>
                   <td>
-                    <Link to={`/user/${user._id}`}>{user.name}</Link>
+                    {user.name}
                   </td>
                   <td>{user.email}</td>
                   <td>{user.role}</td>
@@ -61,37 +75,37 @@ export const UsersList = ({ users }) => {
             </tbody>
           </Table>
           <Pagination className="pagination justify-content-end mb-0">
-  {users.length > 0 && (
-    <PaginationItem>
-      <PaginationLink
-        disabled={currentPage <= 0}
-        onClick={() => setCurrentPage(currentPage - 1)}
-        previous
-        tag="button"
-      />
-    </PaginationItem>
-  )}
-  {[...Array(Math.ceil(users.length / usersPerPage))].map((page, i) => (
-    <PaginationItem active={i === currentPage} key={i}>
-      <PaginationLink
-        onClick={() => setCurrentPage(i)}
-        tag="button"
-      >
-        {i + 1}
-      </PaginationLink>
-    </PaginationItem>
-  ))}
-  {users.length > 0 && (
-    <PaginationItem>
-      <PaginationLink
-        disabled={currentPage >= totalPages - 1}
-        onClick={() => setCurrentPage(currentPage + 1)}
-        next
-        tag="button"
-      />
-    </PaginationItem>
-  )}
-</Pagination>
+            {users.length > 0 && (
+              <PaginationItem>
+                <PaginationLink
+                  disabled={currentPage <= 0}
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  previous
+                  tag="button"
+                />
+              </PaginationItem>
+            )}
+            {[...Array(totalPages)].map((page, i) => (
+              <PaginationItem active={i === currentPage} key={i}>
+                <PaginationLink
+                  onClick={() => paginate(i)}
+                  tag="button"
+                >
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            {users.length > 0 && (
+              <PaginationItem>
+                <PaginationLink
+                  disabled={currentPage >= totalPages - 1}
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  next
+                  tag="button"
+                />
+              </PaginationItem>
+            )}
+          </Pagination>
         </CardBody>
       </Card>
     </Col>
@@ -99,3 +113,4 @@ export const UsersList = ({ users }) => {
 }
 
 export default UsersList
+ 
