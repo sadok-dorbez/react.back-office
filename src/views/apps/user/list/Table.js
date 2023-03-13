@@ -1,98 +1,92 @@
-import React, { useState, useEffect } from "react"
-import { Card, CardBody, CardHeader, Col, Row, Table, Pagination, PaginationItem, PaginationLink } from "reactstrap"
-import axios from "axios"
+import React, { useState } from 'react' 
+import { Link } from 'react-router-dom'
+import {
+  Card,
+  CardBody,
+  Col,
+  Table,
+  Pagination,
+  PaginationItem,
+  PaginationLink
+} from 'reactstrap'
 
-export const UsersList = () => {
-  const [users, setUsers] = useState([])
-  const [currentPage, setCurrentPage] = useState(1)
+export const UsersList = ({ users }) => {
+  const [currentPage, setCurrentPage] = useState(0)
   const [usersPerPage] = useState(10)
-  const [indexOfLastUser, setIndexOfLastUser] = useState(0)
-  const [indexOfFirstUser, setIndexOfFirstUser] = useState(0)
-  const [currentUsers, setCurrentUsers] = useState([])
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const res = await axios.get("http://localhost:3000/api/users")
-      setUsers(res.data)
-    }
-    fetchUsers()
-  }, [])
-
-  useEffect(() => {
-    setIndexOfLastUser(currentPage * usersPerPage)
-    setIndexOfFirstUser(indexOfLastUser - usersPerPage)
-    setCurrentUsers(users.slice(indexOfFirstUser, indexOfLastUser))
-  }, [currentPage, usersPerPage, indexOfLastUser, indexOfFirstUser, users])
+  const indexOfLastUser = (currentPage + 1) * usersPerPage
+  const indexOfFirstUser = indexOfLastUser - usersPerPage
+  const currentUsers = Array.isArray(users) ? users.slice(indexOfFirstUser, indexOfLastUser) : []
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
   return (
-    <div className="animated fadeIn">
-      <Row>
-        <Col xl={12}>
-          <Card>
-            <CardHeader>
-              <i className="fa fa-align-justify"></i> Users{" "}
-              <small className="text-muted">example</small>
-            </CardHeader>
-            <CardBody>
-              <Table responsive hover striped>
-                <thead>
-                  <tr>
-                    <th scope="col">First Name</th>
-                    <th scope="col">Last Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Phone Number</th>
-                    <th scope="col">CIN</th>
-                    <th scope="col">Role</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentUsers.map((user) => (
-                    <tr key={user.id}>
-                      <td>{user.firstName}</td>
-                      <td>{user.lastName}</td>
-                      <td>{user.email}</td>
-                      <td>{user.phoneNumber}</td>
-                      <td>{user.cin}</td>
-                      <td>{user.role}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-              <Pagination>
-                <PaginationItem disabled={currentPage <= 0}>
-                  <PaginationLink
-                    previous
-                    tag="button"
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  />
-                </PaginationItem>
-                {users.length > 0 && Array.from({ length: Math.ceil(users.length / usersPerPage) }, (_, i) => (
-                  <PaginationItem key={i} active={i === currentPage}>
-                    <PaginationLink onClick={() => paginate(i)}>{i + 1}</PaginationLink>
-                  </PaginationItem>
-                ))}
-
-
-                <PaginationItem
-                  disabled={
-                    currentPage >=
-                    Math.ceil(users.length / usersPerPage) - 1
-                  }
-                >
-                  <PaginationLink
-                    next
-                    tag="button"
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  />
-                </PaginationItem>
-              </Pagination>
-            </CardBody>
-          </Card>
-        </Col>
-      </Row>
-    </div>
+    <Col md="12">
+      <Card className="main-card mb-3">
+        <CardBody>
+          <Table hover striped responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentUsers.map((user, i) => (
+                <tr key={i}>
+                  <th scope="row">{i + 1}</th>
+                  <td>
+                    <Link to={`/user/${user._id}`}>{user.name}</Link>
+                  </td>
+                  <td>{user.email}</td>
+                  <td>{user.role}</td>
+                  <td>
+                    <Link
+                      to={`/user/edit/${user._id}`}
+                      className="btn btn-success btn-sm"
+                    >
+                      <i className="fa fa-edit"></i>
+                    </Link>{' '}
+                    <Link
+                      to={`/user/delete/${user._id}`}
+                      className="btn btn-danger btn-sm"
+                    >
+                      <i className="fa fa-trash"></i>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+          <Pagination aria-label="Page navigation example">
+            <PaginationItem disabled={currentPage <= 0}>
+              <PaginationLink
+                onClick={() => setCurrentPage(currentPage - 1)}
+                previous
+                tag="button"
+              />
+            </PaginationItem>
+            {[...Array(Math.ceil(users.length / usersPerPage))].map((page, i) => (
+              <PaginationItem active={i === currentPage} key={i}>
+                <PaginationLink onClick={() => paginate(i)} tag="button">
+                  {i + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem disabled={currentPage >= Math.ceil(users.length / usersPerPage) - 1}>
+              <PaginationLink
+                onClick={() => setCurrentPage(currentPage + 1)}
+                next
+                tag="button"
+              />
+            </PaginationItem>
+          </Pagination>
+        </CardBody>
+      </Card>
+    </Col>
   )
 }
 
