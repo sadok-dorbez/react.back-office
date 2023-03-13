@@ -13,7 +13,6 @@ import {
 export const UsersList = ({ users }) => {
   const [currentPage, setCurrentPage] = useState(0)
   const [usersPerPage] = useState(10)
-
   const indexOfLastUser = (currentPage + 1) * usersPerPage
   const indexOfFirstUser = indexOfLastUser - usersPerPage
   const currentUsers = Array.isArray(users) ? users.slice(indexOfFirstUser, indexOfLastUser) : []
@@ -61,29 +60,38 @@ export const UsersList = ({ users }) => {
               ))}
             </tbody>
           </Table>
-          <Pagination aria-label="Page navigation example">
-            <PaginationItem disabled={currentPage <= 0}>
-              <PaginationLink
-                onClick={() => setCurrentPage(currentPage - 1)}
-                previous
-                tag="button"
-              />
-            </PaginationItem>
-            {[...Array(Math.ceil(users.length / usersPerPage))].map((page, i) => (
-              <PaginationItem active={i === currentPage} key={i}>
-                <PaginationLink onClick={() => paginate(i)} tag="button">
-                  {i + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-            <PaginationItem disabled={currentPage >= Math.ceil(users.length / usersPerPage) - 1}>
-              <PaginationLink
-                onClick={() => setCurrentPage(currentPage + 1)}
-                next
-                tag="button"
-              />
-            </PaginationItem>
-          </Pagination>
+          <Pagination className="pagination justify-content-end mb-0">
+  {users.length > 0 && (
+    <PaginationItem>
+      <PaginationLink
+        disabled={currentPage <= 0}
+        onClick={() => setCurrentPage(currentPage - 1)}
+        previous
+        tag="button"
+      />
+    </PaginationItem>
+  )}
+  {[...Array(Math.ceil(users.length / usersPerPage))].map((page, i) => (
+    <PaginationItem active={i === currentPage} key={i}>
+      <PaginationLink
+        onClick={() => setCurrentPage(i)}
+        tag="button"
+      >
+        {i + 1}
+      </PaginationLink>
+    </PaginationItem>
+  ))}
+  {users.length > 0 && (
+    <PaginationItem>
+      <PaginationLink
+        disabled={currentPage >= totalPages - 1}
+        onClick={() => setCurrentPage(currentPage + 1)}
+        next
+        tag="button"
+      />
+    </PaginationItem>
+  )}
+</Pagination>
         </CardBody>
       </Card>
     </Col>
